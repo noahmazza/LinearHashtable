@@ -7,47 +7,22 @@
 #include <iomanip>
 #include <stdexcept>
 
-/* TESTING CODE */
-template <typename T>
-struct testBucket {
-	int* value;
-
-	testBucket() {
-		value = nullptr;
-	}
-
-	inline static testBucket<T> EMPTY_SINCE_START;
-	inline static testBucket<T> EMPTY_AFTER_REMOVAL;
-};
-
 // Bucket structure to allow checking for type of empty buckets
 // Trying this out because it was shown in the Zybooks, and I wanted to see how it worked
 template <typename T>
 struct Bucket {
-	T* value;  // Value stored in bucket
+	T value{};  // Value stored in bucket
 
-	Bucket() {
-		value = nullptr;
-	}// Default constructor
+	Bucket() {}  // Default constructor
 
 	// Constructor to initialize value with a given value
 	Bucket(T item) {
-		value = new T(item);  // Allocate memory for the value and assign it
-	}
-
-	// Copy constructor for deep copying
-	Bucket(const Bucket& other) : value(other.value ? new T(*other.value) : nullptr) {}
-
-	// Destructor to deallocate memory for the value when the bucket is destroyed
-	~Bucket() {
-		if (value) {
-			delete value;  // Deallocate memory for the value when the bucket is destroyed
-		}
+		value = item;
 	}
 
 	// Static types of empty buckets for comparison of type of empty bucket
-	inline static Bucket<T> EMPTY_SINCE_START;
-	inline static Bucket<T> EMPTY_AFTER_REMOVAL;
+	static Bucket EMPTY_SINCE_START;
+	static Bucket EMPTY_AFTER_REMOVAL;
 
 	// Returns true if the bucket is empty, and if includeEmptyAfterRemoval is false, only returns true if the bucket has been empty since the start of the program
 	bool empty() const {
@@ -60,14 +35,9 @@ struct Bucket {
 
 	T& getValue() {
 		if (value) {
-			return *value;  // Return the value stored in the bucket
+			return value;  // Return the value stored in the bucket
 		}
 		throw std::runtime_error("Bucket is empty");  // Throw an error if the bucket is empty
-	}
-
-	const T& getValue() const {
-		if (!value) throw std::runtime_error("Bucket is empty");
-		return *value;
 	}
 
 	// Returns true if the values in the buckets are equal
@@ -75,10 +45,10 @@ struct Bucket {
 		return value == other.value;
 	}
 
+	// Copies value from other bucket
 	Bucket& operator=(const Bucket& other) {
 		if (this != &other) {
-			delete this->value;  // Deallocate current value
-			this->value = other.value ? new T(*other.value) : nullptr;  // Deep copy the value from the other bucket
+			value = other.value;  // Deep copy the value from the other bucket
 		}
 		return *this;
 	}
